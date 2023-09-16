@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Increment & Decrement in Firebase Realtime Database v9</title>
+    </head>
+
+    <body>
+        <span id="countSpan">Please Wait...</span>
+        <button id="incBtn" disabled>INCREMENT</button>
+        <button id="decBtn">DECREMENT</button>
+
+        <script type="module">
+            // Import the functions you need from the SDKs you need
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+            // TODO: Add SDKs for Firebase products that you want to use
+            // https://firebase.google.com/docs/web/setup#available-libraries
+          
+            // Your web app's Firebase configuration
+            const firebaseConfig = {
+              apiKey: "AIzaSyBRw84qAgydlgZobxkRQnau_0oKJq4NCQQ",
+              authDomain: "fire9db-d05ae.firebaseapp.com",
+              projectId: "fire9db-d05ae",
+              storageBucket: "fire9db-d05ae.appspot.com",
+              messagingSenderId: "910189230819",
+              appId: "1:910189230819:web:05f9bebcd71b2c3c8963d6"
+            };
+          
+            // Initialize Firebase
+            const app = initializeApp(firebaseConfig);
+            import {getDatabase, ref, get, set, child, update, remove}
+            from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
+
+            const db = getDatabase();
+
+            // ------------------- References ------------------- //
+            let span = document.getElementById('countSpan');
+            let inc = document.getElementById('incBtn');
+            let dec = document.getElementById('decBtn');
+            let countVariable;
+
+            window.onload = function() {
+                const dbRef = ref(db);
+
+                get(child(dbRef, 'Counter')).then((snapshot) => {
+                    countVariable = Number(snapshot.val());
+                    span.innerHTML = countVariable;
+                    BtnsEnable();
+                });
+            }
+
+            // ------------------- Increment & Decrement ------------------- //
+            function IncDecCounter() {
+                BtnsDisable();
+
+                const dbRef = ref(db);
+
+                get(child(dbRef, 'Counter')).then((snapshot) => {
+                    countVariable = Number(snapshot.val());
+
+                    if(this.id == 'incBtn') {
+                        countVariable = (countVariable + 1);
+                    } else {
+                        countVariable = (countVariable - 1);
+                    }
+
+                    update(ref(db, "/"), {
+                        Counter: countVariable
+                    });
+
+                    span.innerHTML = countVariable;
+                    setTimeout(BtnsEnable, 500);
+                });
+            }
+
+            // ------------------- Functions ------------------- //
+            function BtnsEnable() {
+                inc.disabled = false;
+                dec.disabled = false;
+            }
+
+            function BtnsDisable() {
+                inc.disabled = true;
+                dec.disabled = true;
+            }
+
+            // ------------------- Assign Events to Btns ------------------- //
+            inc.addEventListener('click', IncDecCounter);
+            dec.addEventListener('click', IncDecCounter);
+        </script>
+    </body>
+</html>
